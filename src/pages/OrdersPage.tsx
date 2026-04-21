@@ -154,7 +154,6 @@ export const OrdersPage = ({
                       ? friendlyId(order.trip_id, "TRP")
                       : vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned"}
                   </span>
-                  </span>
                   {!(order.trip_id || order.vehicle_id) && (
                     <button
                       type="button"
