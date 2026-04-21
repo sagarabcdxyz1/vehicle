@@ -2,17 +2,21 @@ import { useState } from "react";
 import { Upload } from "lucide-react";
 import { formatDateTime } from "../lib/utils";
 import { getRouteName } from "../lib/optimization";
-import type { Order, RouteDefinition } from "../types/fleet";
+import type { Order, PlanningMode, RouteDefinition, Vehicle } from "../types/fleet";
 
 export const OrdersPage = ({
   orders,
   routes,
+  vehicles,
+  planningMode,
   onAddOrder,
   onUploadCsv,
   onReassign
 }: {
   orders: Order[];
   routes: RouteDefinition[];
+  vehicles: Vehicle[];
+  planningMode: PlanningMode;
   onAddOrder: (input: { route_id: string; weight: number; deadline: string; source: "manual" }) => Promise<string>;
   onUploadCsv: (file: File) => Promise<number>;
   onReassign: (orderId: string) => string;
@@ -33,6 +37,17 @@ export const OrdersPage = ({
   return (
     <div className="grid gap-4 xl:grid-cols-[0.95fr_1.35fr]">
       <section className="space-y-4">
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5">
+          <p className="text-sm text-slate-500">Dispatch flow</p>
+          <h3 className="text-xl font-semibold text-slate-900">
+            {planningMode === "trip" ? "Batch orders into planned trips" : "Assign each order directly to a vehicle"}
+          </h3>
+          <p className="mt-3 text-sm text-slate-600">
+            {planningMode === "trip"
+              ? "Use trips when multiple orders should be consolidated into route-based runs with shared vehicle capacity."
+              : "Use direct mode when each order behaves like a dedicated shipment and should go straight to the best available vehicle."}
+          </p>
+        </div>
         <div className="rounded-[28px] border border-slate-200 bg-white p-5">
           <p className="text-sm text-slate-500">Manual entry</p>
           <h3 className="text-xl font-semibold text-slate-900">Create order</h3>
@@ -122,17 +137,26 @@ export const OrdersPage = ({
                   <p className="mt-1 text-sm text-slate-600">
                     {order.weight} tons - Deadline {formatDateTime(order.deadline)} - Source {order.source}
                   </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {planningMode === "trip"
+                      ? `Assignment: ${order.trip_id ?? "unassigned trip"}`
+                      : `Assignment: ${
+                          vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned vehicle"
+                        }`}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase text-slate-600">
-                    {order.trip_id ?? "unassigned"}
+                    {planningMode === "trip"
+                      ? order.trip_id ?? "unassigned"
+                      : vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned"}
                   </span>
                   <button
                     type="button"
                     onClick={() => setMessage(onReassign(order.id))}
                     className="rounded-2xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                   >
-                    Assign to trip
+                    {planningMode === "trip" ? "Assign to trip" : "Assign vehicle"}
                   </button>
                 </div>
               </div>

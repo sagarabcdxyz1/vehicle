@@ -90,7 +90,8 @@ export const mockOrders: Order[] = [
     deadline: toIso(addMinutes(now, 210)),
     source: "manual",
     created_at: toIso(addMinutes(now, -80)),
-    trip_id: "trip-1001"
+    trip_id: "trip-1001",
+    vehicle_id: "veh-101"
   },
   {
     id: randomId("order"),
@@ -99,7 +100,8 @@ export const mockOrders: Order[] = [
     deadline: toIso(addMinutes(now, 380)),
     source: "csv",
     created_at: toIso(addMinutes(now, -25)),
-    trip_id: "trip-1002"
+    trip_id: "trip-1002",
+    vehicle_id: "veh-201"
   },
   {
     id: randomId("order"),
@@ -108,7 +110,8 @@ export const mockOrders: Order[] = [
     deadline: toIso(addMinutes(now, 600)),
     source: "manual",
     created_at: toIso(addMinutes(now, -10)),
-    trip_id: "trip-1003"
+    trip_id: "trip-1003",
+    vehicle_id: null
   }
 ];
 

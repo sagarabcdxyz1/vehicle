@@ -2,6 +2,7 @@ export type VehicleType = "own" | "agency" | "oncall";
 export type VehicleStatus = "available" | "assigned" | "running" | "idle" | "maintenance";
 export type TripStatus = "planned" | "running" | "delayed" | "completed";
 export type OrderSource = "manual" | "csv" | "api";
+export type PlanningMode = "trip" | "direct";
 
 export interface AppUser {
   id: string;
@@ -52,6 +53,7 @@ export interface Order {
   source: OrderSource;
   created_at: string;
   trip_id: string | null;
+  vehicle_id?: string | null;
 }
 
 export interface TripOrder {

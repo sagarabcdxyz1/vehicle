@@ -51,6 +51,7 @@ create table if not exists public.orders (
   deadline timestamptz not null,
   source text not null check (source in ('manual', 'csv', 'api')),
   trip_id uuid references public.trips(id) on delete set null,
+  vehicle_id uuid references public.vehicles(id) on delete set null,
   created_at timestamptz default now()
 );
 

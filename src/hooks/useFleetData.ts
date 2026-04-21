@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import { mockOrders, mockRoutes, mockTrips, mockVehicles } from "../lib/mockData";
 import {
+  assignOrderDirectToVehicle,
   assignOrderToTrip,
   assignVehiclesToTrips,
   buildAlerts,
@@ -9,7 +10,16 @@ import {
 } from "../lib/optimization";
 import { randomId, toIso } from "../lib/utils";
 import { supabase } from "../lib/supabase";
-import type { AlertItem, FleetSnapshot, Order, OrderSource, RouteDefinition, Trip, Vehicle } from "../types/fleet";
+import type {
+  AlertItem,
+  FleetSnapshot,
+  Order,
+  OrderSource,
+  PlanningMode,
+  RouteDefinition,
+  Trip,
+  Vehicle
+} from "../types/fleet";
 
 interface ManualOrderInput {
   route_id: string;
@@ -39,6 +49,10 @@ export const useFleetData = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [mode, setMode] = useState<"demo" | "live">("demo");
+  const [planningMode, setPlanningMode] = useState<PlanningMode>(() => {
+    const stored = window.localStorage.getItem("fleet-planning-mode");
+    return stored === "direct" ? "direct" : "trip";
+  });
 
   useEffect(() => {
     const derived = syncDerivedState(routes, trips, vehicles);
@@ -140,6 +154,10 @@ export const useFleetData = () => {
     setAlerts(buildAlerts(trips, vehicles, routes));
   }, [routes, trips, vehicles]);
 
+  useEffect(() => {
+    window.localStorage.setItem("fleet-planning-mode", planningMode);
+  }, [planningMode]);
+
   const persistOptimization = async (nextTrips: Trip[], nextVehicles: Vehicle[], nextOrder?: Order) => {
     if (!supabase) {
       return;
@@ -177,7 +195,8 @@ export const useFleetData = () => {
             weight: nextOrder.weight,
             deadline: nextOrder.deadline,
             source: nextOrder.source,
-            trip_id: nextOrder.trip_id
+            trip_id: nextOrder.trip_id,
+            vehicle_id: nextOrder.vehicle_id
           })
         : Promise.resolve()
     ]);
@@ -191,12 +210,20 @@ export const useFleetData = () => {
       deadline: new Date(input.deadline).toISOString(),
       source: input.source,
       created_at: toIso(new Date()),
-      trip_id: null
+      trip_id: null,
+      vehicle_id: null
     };
 
     const nextTrips = [...trips].map((trip) => ({ ...trip }));
-    const result = assignOrderToTrip(order, nextTrips, routes);
-    const allocation = assignVehiclesToTrips(nextTrips, vehicles);
+    const nextVehicles = vehicles.map((vehicle) => ({ ...vehicle }));
+    const result =
+      planningMode === "trip"
+        ? assignOrderToTrip(order, nextTrips, routes)
+        : assignOrderDirectToVehicle(order, nextVehicles, routes);
+    const allocation =
+      planningMode === "trip"
+        ? assignVehiclesToTrips(nextTrips, nextVehicles)
+        : { trips: nextTrips, vehicles: nextVehicles };
     const nextOrders = [order, ...orders];
 
     setOrders(nextOrders);
@@ -264,9 +291,17 @@ export const useFleetData = () => {
       }
       target.trip_id = null;
     }
+    target.vehicle_id = null;
 
-    const result = assignOrderToTrip(target, nextTrips, routes);
-    const allocation = assignVehiclesToTrips(nextTrips, vehicles);
+    const nextVehicles = vehicles.map((vehicle) => ({ ...vehicle }));
+    const result =
+      planningMode === "trip"
+        ? assignOrderToTrip(target, nextTrips, routes)
+        : assignOrderDirectToVehicle(target, nextVehicles, routes);
+    const allocation =
+      planningMode === "trip"
+        ? assignVehiclesToTrips(nextTrips, nextVehicles)
+        : { trips: nextTrips, vehicles: nextVehicles };
 
     setOrders(nextOrders);
     setTrips(
@@ -294,6 +329,8 @@ export const useFleetData = () => {
   return {
     ...snapshot,
     mode,
+    planningMode,
+    setPlanningMode,
     addOrder,
     uploadCsv,
     reassignOrder

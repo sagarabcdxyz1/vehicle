@@ -115,6 +115,7 @@ export const assignOrderToTrip = (
     bestTrip.used_capacity += order.weight;
     bestTrip.utilization = Math.min(100, (bestTrip.used_capacity / bestTrip.capacity) * 100);
     order.trip_id = bestTrip.id;
+    order.vehicle_id = bestTrip.vehicle_id;
     return { trip: bestTrip, reason: "Assigned to best-fit trip by route, capacity, and deadline." };
   }
 
@@ -139,8 +140,49 @@ export const assignOrderToTrip = (
   };
 
   order.trip_id = newTrip.id;
+  order.vehicle_id = null;
   trips.push(newTrip);
   return { trip: newTrip, reason: "No suitable trip found, so a new trip slot was created." };
+};
+
+export const assignOrderDirectToVehicle = (
+  order: Order,
+  vehicles: Vehicle[],
+  routes: RouteDefinition[]
+) => {
+  const route = routes.find((item) => item.id === order.route_id);
+
+  if (!route) {
+    return { vehicle: null, reason: "Route not found." };
+  }
+
+  const durationMinutes = route.travel_time + route.load_time + route.unload_time;
+
+  for (const type of vehiclePriority) {
+    const vehicle = vehicles
+      .filter((candidate) => candidate.type === type && candidate.capacity >= order.weight)
+      .sort((a, b) => +new Date(a.available_at) - +new Date(b.available_at))
+      .find((candidate) => {
+        const dispatchStart = new Date(candidate.available_at);
+        const finishAt = addMinutes(dispatchStart, durationMinutes);
+        return finishAt <= new Date(order.deadline);
+      });
+
+    if (vehicle) {
+      const dispatchStart = new Date(vehicle.available_at);
+      vehicle.available_at = toIso(addMinutes(dispatchStart, durationMinutes));
+      vehicle.status = new Date(dispatchStart) <= new Date() ? "running" : "assigned";
+      vehicle.current_route = route.id;
+      order.vehicle_id = vehicle.id;
+      order.trip_id = null;
+      return {
+        vehicle,
+        reason: `Assigned directly to ${vehicle.label} using ${type} vehicle priority.`
+      };
+    }
+  }
+
+  return { vehicle: null, reason: "No direct vehicle is available before the delivery deadline." };
 };
 
 export const buildAlerts = (trips: Trip[], vehicles: Vehicle[], routes: RouteDefinition[]): AlertItem[] => {

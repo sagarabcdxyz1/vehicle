@@ -29,6 +29,8 @@ const ProtectedRoutes = () => {
             onToggleDarkMode={() => setDarkMode((current) => !current)}
             onSignOut={() => void signOut()}
             mode={fleet.mode}
+            planningMode={fleet.planningMode}
+            onPlanningModeChange={fleet.setPlanningMode}
           />
         }
       >
@@ -40,6 +42,8 @@ const ProtectedRoutes = () => {
             <OrdersPage
               orders={fleet.orders}
               routes={fleet.routes}
+              vehicles={fleet.vehicles}
+              planningMode={fleet.planningMode}
               onAddOrder={fleet.addOrder}
               onUploadCsv={fleet.uploadCsv}
               onReassign={fleet.reassignOrder}

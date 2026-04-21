@@ -1,6 +1,7 @@
-import { Bell, LayoutDashboard, Map, Moon, Package, Sun, Truck } from "lucide-react";
+import { Bell, LayoutDashboard, Map, Moon, Package, Sun, ToggleLeft, Truck } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { cn } from "../../lib/utils";
+import type { PlanningMode } from "../../types/fleet";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -14,12 +15,16 @@ export const AppShell = ({
   darkMode,
   onToggleDarkMode,
   onSignOut,
-  mode
+  mode,
+  planningMode,
+  onPlanningModeChange
 }: {
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onSignOut: () => void;
   mode: "demo" | "live";
+  planningMode: PlanningMode;
+  onPlanningModeChange: (mode: PlanningMode) => void;
 }) => (
   <div className={cn("min-h-screen p-4 text-slate-900", darkMode && "dark")}>
     <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-7xl gap-4 lg:grid-cols-[280px_1fr]">
@@ -78,6 +83,27 @@ export const AppShell = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <div className="rounded-2xl border border-slate-200 px-2 py-2">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+                <ToggleLeft size={14} />
+                Planning
+              </div>
+              <div className="mt-2 flex rounded-2xl bg-slate-100 p-1">
+                {(["trip", "direct"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onPlanningModeChange(option)}
+                    className={cn(
+                      "rounded-xl px-3 py-1.5 text-sm font-medium capitalize transition",
+                      planningMode === option ? "bg-white text-ink shadow-sm" : "text-slate-600"
+                    )}
+                  >
+                    {option === "trip" ? "Trip mode" : "Direct mode"}
+                  </button>
+                ))}
+              </div>
+            </div>
             <button
               type="button"
               onClick={onToggleDarkMode}
