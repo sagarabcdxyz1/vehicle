@@ -56,7 +56,7 @@ export const TrackingPage = ({
             })}
 
             {/* Render Active Vehicles on those routes */}
-            {activeTrips.map((trip, i) => {
+            {activeTrips.map((trip) => {
               const routeIndex = routes.findIndex(r => r.id === trip.route_id);
               if (routeIndex === -1 || routeIndex > 4) return null;
               

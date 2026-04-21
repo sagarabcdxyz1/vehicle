@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Plus, Trash2, Edit2, X, Check, Phone } from "lucide-react";
-import { formatDateTime } from "../lib/utils";
 import type { Vehicle, VehicleType } from "../types/fleet";
 
 export const VehiclesPage = ({
