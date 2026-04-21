@@ -117,7 +117,6 @@ export const useFleetData = () => {
         const { data } = await client.from("vehicles").select("*");
         if (data) {
           setVehicles(data as Vehicle[]);
-          setMode("live");
         }
       })
       .subscribe();
@@ -133,7 +132,6 @@ export const useFleetData = () => {
               utilization: trip.capacity ? (trip.used_capacity / trip.capacity) * 100 : 0
             }))
           );
-          setMode("live");
         }
       })
       .subscribe();
