@@ -28,7 +28,6 @@ const ProtectedRoutes = () => {
             darkMode={darkMode}
             onToggleDarkMode={() => setDarkMode((current) => !current)}
             onSignOut={() => void signOut()}
-            mode={fleet.mode}
             planningMode={fleet.planningMode}
             onPlanningModeChange={fleet.setPlanningMode}
           />

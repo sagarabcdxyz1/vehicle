@@ -15,14 +15,12 @@ export const AppShell = ({
   darkMode,
   onToggleDarkMode,
   onSignOut,
-  mode,
   planningMode,
   onPlanningModeChange
 }: {
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onSignOut: () => void;
-  mode: "demo" | "live";
   planningMode: PlanningMode;
   onPlanningModeChange: (mode: PlanningMode) => void;
 }) => (

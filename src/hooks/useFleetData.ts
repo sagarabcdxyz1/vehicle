@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
-import { mockOrders, mockRoutes, mockTrips, mockVehicles } from "../lib/mockData";
 import {
   assignOrderDirectToVehicle,
   assignOrderToTrip,
@@ -48,7 +47,6 @@ export const useFleetData = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [mode, setMode] = useState<"demo" | "live">("live");
   const [planningMode, setPlanningMode] = useState<PlanningMode>(() => {
     const stored = window.localStorage.getItem("fleet-planning-mode");
     return stored === "direct" ? "direct" : "trip";
@@ -324,7 +322,6 @@ export const useFleetData = () => {
 
   return {
     ...snapshot,
-    mode,
     planningMode,
     setPlanningMode,
     addOrder,
