@@ -1,4 +1,4 @@
-import { formatDateTime, formatPct } from "../lib/utils";
+import { formatDateTime, formatPct, friendlyId } from "../lib/utils";
 import { getRouteName } from "../lib/optimization";
 import type { RouteDefinition, Trip } from "../types/fleet";
 
@@ -29,7 +29,9 @@ export const TripsPage = ({ trips, routes }: { trips: Trip[]; routes: RouteDefin
         <tbody className="divide-y divide-slate-100">
           {trips.map((trip) => (
             <tr key={trip.id}>
-              <td className="py-4 font-medium text-slate-900">{trip.id}</td>
+              <td className="py-4 font-medium text-slate-900" title={trip.id}>
+                {friendlyId(trip.id, "TRP")}
+              </td>
               <td className="py-4 text-slate-700">{getRouteName(trip.route_id, routes)}</td>
               <td className="py-4 text-slate-700">{formatDateTime(trip.start_time)}</td>
               <td className="py-4 text-slate-700">{formatDateTime(trip.end_time)}</td>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Upload } from "lucide-react";
-import { formatDateTime } from "../lib/utils";
+import { formatDateTime, friendlyId } from "../lib/utils";
 import { getRouteName } from "../lib/optimization";
 import type { Order, PlanningMode, RouteDefinition, Vehicle } from "../types/fleet";
 
@@ -139,16 +139,19 @@ export const OrdersPage = ({
                   </p>
                   <p className="mt-1 text-sm text-slate-500">
                     {planningMode === "trip"
-                      ? `Assignment: ${order.trip_id ?? "unassigned trip"}`
+                      ? `Assignment: ${friendlyId(order.trip_id, "TRP")}`
                       : `Assignment: ${
                           vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned vehicle"
                         }`}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase text-slate-600">
+                  <span 
+                    title={order.trip_id ?? undefined}
+                    className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase text-slate-600"
+                  >
                     {planningMode === "trip"
-                      ? order.trip_id ?? "unassigned"
+                      ? friendlyId(order.trip_id, "TRP")
                       : vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned"}
                   </span>
                   <button
