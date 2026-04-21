@@ -19,6 +19,9 @@ export interface Vehicle {
   status: VehicleStatus;
   current_route?: string;
   last_known_location?: number;
+  registration_number?: string;
+  driver_name?: string;
+  driver_phone?: string;
 }
 
 export interface RouteDefinition {
@@ -29,6 +32,8 @@ export interface RouteDefinition {
   unload_time: number;
   distance_km: number;
   base_capacity: number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface Trip {

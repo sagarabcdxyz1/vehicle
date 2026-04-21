@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Trash2, Edit2, X, Check } from "lucide-react";
+import { Plus, Trash2, Edit2, X, Check, Calendar } from "lucide-react";
+import { formatDateTime } from "../lib/utils";
 import type { RouteDefinition } from "../types/fleet";
 
 export const RoutesPage = ({
@@ -22,7 +23,9 @@ export const RoutesPage = ({
     load_time: 30,
     unload_time: 30,
     distance_km: 100,
-    base_capacity: 18
+    base_capacity: 18,
+    start_date: "",
+    end_date: ""
   });
 
   const resetForm = () => {
@@ -33,7 +36,9 @@ export const RoutesPage = ({
       load_time: 30,
       unload_time: 30,
       distance_km: 100,
-      base_capacity: 18
+      base_capacity: 18,
+      start_date: "",
+      end_date: ""
     });
     setEditingId(null);
     setIsAdding(false);
@@ -55,7 +60,11 @@ export const RoutesPage = ({
   };
 
   const startEdit = (route: RouteDefinition) => {
-    setForm(route);
+    setForm({
+      ...route,
+      start_date: route.start_date || "",
+      end_date: route.end_date || ""
+    });
     setEditingId(route.id);
     setIsAdding(false);
   };
@@ -82,19 +91,17 @@ export const RoutesPage = ({
         <table className="min-w-full text-left text-sm">
           <thead className="text-slate-500">
             <tr>
-              <th className="pb-3">ID / Code</th>
-              <th className="pb-3">Name</th>
-              <th className="pb-3">Distance</th>
-              <th className="pb-3">Time (Mins)</th>
-              <th className="pb-3">Load/Unload</th>
-              <th className="pb-3">Base Capacity</th>
+              <th className="pb-3">Route Details</th>
+              <th className="pb-3">Validity Period</th>
+              <th className="pb-3">Metrics</th>
+              <th className="pb-3">Capacity</th>
               <th className="pb-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {(isAdding || editingId) && (
               <tr className="bg-slate-50/50">
-                <td className="py-2">
+                <td className="py-4 space-y-2">
                   <input
                     type="text"
                     disabled={!!editingId}
@@ -103,8 +110,6 @@ export const RoutesPage = ({
                     onChange={(e) => setForm({ ...form, id: e.target.value })}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs outline-none focus:border-accent"
                   />
-                </td>
-                <td className="py-2">
                   <input
                     type="text"
                     placeholder="Display Name"
@@ -113,41 +118,61 @@ export const RoutesPage = ({
                     className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs outline-none focus:border-accent"
                   />
                 </td>
-                <td className="py-2">
-                  <input
-                    type="number"
-                    value={form.distance_km}
-                    onChange={(e) => setForm({ ...form, distance_km: Number(e.target.value) })}
-                    className="w-20 rounded-xl border border-slate-200 px-2 py-2 text-xs outline-none focus:border-accent"
-                  />
+                <td className="py-4 space-y-2">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Start Date</span>
+                    <input
+                      type="date"
+                      value={form.start_date ? form.start_date.split("T")[0] : ""}
+                      onChange={(e) => setForm({ ...form, start_date: e.target.value ? new Date(e.target.value).toISOString() : "" })}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">End Date</span>
+                    <input
+                      type="date"
+                      value={form.end_date ? form.end_date.split("T")[0] : ""}
+                      onChange={(e) => setForm({ ...form, end_date: e.target.value ? new Date(e.target.value).toISOString() : "" })}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs outline-none focus:border-accent"
+                    />
+                  </div>
                 </td>
-                <td className="py-2">
-                  <input
-                    type="number"
-                    value={form.travel_time}
-                    onChange={(e) => setForm({ ...form, travel_time: Number(e.target.value) })}
-                    className="w-20 rounded-xl border border-slate-200 px-2 py-2 text-xs outline-none focus:border-accent"
-                  />
-                </td>
-                <td className="py-2">
-                  <div className="flex gap-1">
+                <td className="py-4 space-y-2 text-xs">
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="KM"
+                      value={form.distance_km}
+                      onChange={(e) => setForm({ ...form, distance_km: Number(e.target.value) })}
+                      className="w-16 rounded-xl border border-slate-200 px-2 py-2 outline-none focus:border-accent"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Mins"
+                      value={form.travel_time}
+                      onChange={(e) => setForm({ ...form, travel_time: Number(e.target.value) })}
+                      className="w-16 rounded-xl border border-slate-200 px-2 py-2 outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div className="flex gap-2 text-slate-400">
                     <input
                       type="number"
                       placeholder="Load"
                       value={form.load_time}
                       onChange={(e) => setForm({ ...form, load_time: Number(e.target.value) })}
-                      className="w-14 rounded-xl border border-slate-200 px-2 py-2 text-xs outline-none focus:border-accent"
+                      className="w-16 rounded-xl border border-slate-200 px-2 py-2 outline-none focus:border-accent"
                     />
                     <input
                       type="number"
                       placeholder="Unload"
                       value={form.unload_time}
                       onChange={(e) => setForm({ ...form, unload_time: Number(e.target.value) })}
-                      className="w-14 rounded-xl border border-slate-200 px-2 py-2 text-xs outline-none focus:border-accent"
+                      className="w-16 rounded-xl border border-slate-200 px-2 py-2 outline-none focus:border-accent"
                     />
                   </div>
                 </td>
-                <td className="py-2">
+                <td className="py-4">
                   <input
                     type="number"
                     value={form.base_capacity}
@@ -155,7 +180,7 @@ export const RoutesPage = ({
                     className="w-20 rounded-xl border border-slate-200 px-2 py-2 text-xs outline-none focus:border-accent"
                   />
                 </td>
-                <td className="py-2 text-right">
+                <td className="py-4 text-right">
                   <div className="flex justify-end gap-2">
                     <button onClick={handleSave} className="rounded-xl bg-accent p-2 text-white hover:opacity-90">
                       <Check size={14} />
@@ -169,12 +194,25 @@ export const RoutesPage = ({
             )}
             {routes.map((route) => (
               <tr key={route.id} className={editingId === route.id ? "opacity-30" : ""}>
-                <td className="py-4 font-mono text-xs font-medium text-slate-500">{route.id}</td>
-                <td className="py-4 font-medium text-slate-900">{route.name}</td>
-                <td className="py-4 text-slate-700">{route.distance_km} km</td>
-                <td className="py-4 text-slate-700">{route.travel_time}m</td>
+                <td className="py-4">
+                  <div className="flex flex-col">
+                    <span className="font-medium text-slate-900">{route.name}</span>
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">{route.id}</span>
+                  </div>
+                </td>
+                <td className="py-4 text-slate-600">
+                  <div className="flex items-center gap-2 text-[10px] font-medium">
+                    <Calendar size={12} className="text-slate-400" />
+                    <span>{route.start_date ? formatDateTime(route.start_date).split(",")[0] : "Always Active"}</span>
+                    <span className="text-slate-300">→</span>
+                    <span>{route.end_date ? formatDateTime(route.end_date).split(",")[0] : "Permanent"}</span>
+                  </div>
+                </td>
                 <td className="py-4 text-slate-700">
-                  {route.load_time}m / {route.unload_time}m
+                  <div className="flex flex-col">
+                    <span className="font-medium">{route.distance_km} km</span>
+                    <span className="text-[10px] text-slate-400">{route.travel_time}m (trip) + {route.load_time + route.unload_time}m (L/U)</span>
+                  </div>
                 </td>
                 <td className="py-4 text-slate-700">{route.base_capacity} t</td>
                 <td className="py-4 text-right">

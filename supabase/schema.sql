@@ -132,3 +132,22 @@ values
   ('route-delhi-jaipur', 'Delhi -> Jaipur', 290, 40, 35, 281, 22),
   ('route-bengaluru-chennai', 'Bengaluru -> Chennai', 360, 45, 40, 347, 24)
 on conflict (id) do nothing;
+
+-- Enable Real-time for all operational tables
+begin;
+  drop publication if exists supabase_realtime;
+  create publication supabase_realtime;
+commit;
+
+alter publication supabase_realtime add table public.vehicles;
+alter publication supabase_realtime add table public.routes;
+alter publication supabase_realtime add table public.orders;
+alter publication supabase_realtime add table public.trips;
+
+-- Migration: Add vehicle driver details and route validity dates
+alter table public.vehicles add column if not exists registration_number text;
+alter table public.vehicles add column if not exists driver_name text;
+alter table public.vehicles add column if not exists driver_phone text;
+
+alter table public.routes add column if not exists start_date timestamptz;
+alter table public.routes add column if not exists end_date timestamptz;

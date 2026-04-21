@@ -154,13 +154,16 @@ export const OrdersPage = ({
                       ? friendlyId(order.trip_id, "TRP")
                       : vehicles.find((vehicle) => vehicle.id === order.vehicle_id)?.label ?? "unassigned"}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setMessage(onReassign(order.id))}
-                    className="rounded-2xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-                  >
-                    {planningMode === "trip" ? "Assign to trip" : "Assign vehicle"}
-                  </button>
+                  </span>
+                  {!(order.trip_id || order.vehicle_id) && (
+                    <button
+                      type="button"
+                      onClick={() => setMessage(onReassign(order.id))}
+                      className="rounded-2xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      {planningMode === "trip" ? "Assign to trip" : "Assign vehicle"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

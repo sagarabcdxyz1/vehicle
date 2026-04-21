@@ -193,7 +193,10 @@ export const useFleetData = () => {
           available_at: vehicle.available_at,
           status: vehicle.status,
           current_route: vehicle.current_route,
-          last_known_location: vehicle.last_known_location
+          last_known_location: vehicle.last_known_location,
+          registration_number: vehicle.registration_number,
+          driver_name: vehicle.driver_name,
+          driver_phone: vehicle.driver_phone
         }))
       ),
       nextOrder
@@ -325,36 +328,53 @@ export const useFleetData = () => {
 
   const addVehicle = async (input: Omit<Vehicle, "id" | "available_at" | "status">) => {
     if (!supabase) return;
-    await supabase.from("vehicles").insert({
+    const newVehicle: Vehicle = {
       id: randomId("veh"),
       ...input,
       available_at: toIso(new Date()),
       status: "available"
+    };
+    setVehicles((current) => [...current, newVehicle]);
+    await supabase.from("vehicles").insert({
+      id: newVehicle.id,
+      label: newVehicle.label,
+      type: newVehicle.type,
+      capacity: newVehicle.capacity,
+      available_at: newVehicle.available_at,
+      status: newVehicle.status,
+      registration_number: newVehicle.registration_number,
+      driver_name: newVehicle.driver_name,
+      driver_phone: newVehicle.driver_phone
     });
   };
 
   const updateVehicle = async (id: string, input: Partial<Vehicle>) => {
     if (!supabase) return;
+    setVehicles((current) => current.map((v) => (v.id === id ? { ...v, ...input } : v)));
     await supabase.from("vehicles").update(input).eq("id", id);
   };
 
   const deleteVehicle = async (id: string) => {
     if (!supabase) return;
+    setVehicles((current) => current.filter((v) => v.id !== id));
     await supabase.from("vehicles").delete().eq("id", id);
   };
 
   const addRoute = async (input: RouteDefinition) => {
     if (!supabase) return;
+    setRoutes((current) => [...current, input]);
     await supabase.from("routes").insert(input);
   };
 
   const updateRoute = async (id: string, input: Partial<RouteDefinition>) => {
     if (!supabase) return;
+    setRoutes((current) => current.map((r) => (r.id === id ? { ...r, ...input } : r)));
     await supabase.from("routes").update(input).eq("id", id);
   };
 
   const deleteRoute = async (id: string) => {
     if (!supabase) return;
+    setRoutes((current) => current.filter((r) => r.id !== id));
     await supabase.from("routes").delete().eq("id", id);
   };
 
