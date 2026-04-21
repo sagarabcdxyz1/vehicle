@@ -59,23 +59,7 @@ export const AppShell = ({
           })}
         </nav>
 
-        <div className="mt-10 rounded-3xl bg-white/10 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs uppercase tracking-[0.3em] text-white/55">Data Source</span>
-            <div className="flex items-center gap-2">
-              <span className={cn(
-                "h-2 w-2 rounded-full",
-                mode === "live" ? "bg-emerald-400 animate-pulse-live" : "bg-amber-400"
-              )} />
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                {mode}
-              </span>
-            </div>
-          </div>
-          <p className="mt-3 text-[11px] leading-relaxed text-white/50">
-            Real-time operations active. Supabase connection {mode === "live" ? "established" : "pending/disconnected"}.
-          </p>
-        </div>
+
       </aside>
 
       <main className="rounded-[32px] border border-slate-200/70 bg-white/80 p-5 shadow-panel backdrop-blur lg:p-8">
@@ -83,16 +67,7 @@ export const AppShell = ({
           <div>
             <div className="flex items-center gap-3">
               <p className="text-sm text-slate-500">Control tower</p>
-              <span className={cn(
-                "flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest",
-                mode === "live" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-              )}>
-                <span className={cn(
-                  "h-1.5 w-1.5 rounded-full",
-                  mode === "live" ? "bg-emerald-500 animate-pulse-live" : "bg-amber-500"
-                )} />
-                {mode}
-              </span>
+
             </div>
             <div className="mt-2 flex items-center gap-3">
               <Bell className="text-accent" size={20} />
