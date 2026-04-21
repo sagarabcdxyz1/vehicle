@@ -43,12 +43,12 @@ const syncDerivedState = (routes: RouteDefinition[], trips: Trip[], vehicles: Ve
 };
 
 export const useFleetData = () => {
-  const [routes, setRoutes] = useState<RouteDefinition[]>(mockRoutes);
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
-  const [trips, setTrips] = useState<Trip[]>(mockTrips);
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
+  const [routes, setRoutes] = useState<RouteDefinition[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [mode, setMode] = useState<"demo" | "live">("demo");
+  const [mode, setMode] = useState<"demo" | "live">("live");
   const [planningMode, setPlanningMode] = useState<PlanningMode>(() => {
     const stored = window.localStorage.getItem("fleet-planning-mode");
     return stored === "direct" ? "direct" : "trip";
@@ -91,15 +91,15 @@ export const useFleetData = () => {
           client.from("orders").select("*").order("created_at", { ascending: false })
         ]);
 
-      if (routesData?.length) {
+      if (routesData) {
         setRoutes(routesData as RouteDefinition[]);
       }
 
-      if (vehiclesData?.length) {
+      if (vehiclesData) {
         setVehicles(vehiclesData as Vehicle[]);
       }
 
-      if (tripsData?.length) {
+      if (tripsData) {
         setTrips(
           (tripsData as Trip[]).map((trip) => ({
             ...trip,
@@ -108,12 +108,8 @@ export const useFleetData = () => {
         );
       }
 
-      if (ordersData?.length) {
+      if (ordersData) {
         setOrders(ordersData as Order[]);
-      }
-
-      if (routesData || vehiclesData || tripsData || ordersData) {
-        setMode("live");
       }
     })();
 
