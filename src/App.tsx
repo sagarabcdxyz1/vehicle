@@ -10,6 +10,7 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage").then((module) => ({ d
 const TrackingPage = lazy(() => import("./pages/TrackingPage").then((module) => ({ default: module.TrackingPage })));
 const TripsPage = lazy(() => import("./pages/TripsPage").then((module) => ({ default: module.TripsPage })));
 const VehiclesPage = lazy(() => import("./pages/VehiclesPage").then((module) => ({ default: module.VehiclesPage })));
+const RoutesPage = lazy(() => import("./pages/RoutesPage").then((module) => ({ default: module.RoutesPage })));
 
 const ProtectedRoutes = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -49,7 +50,28 @@ const ProtectedRoutes = () => {
             />
           }
         />
-        <Route path="/vehicles" element={<VehiclesPage vehicles={fleet.vehicles} />} />
+        <Route
+          path="/vehicles"
+          element={
+            <VehiclesPage
+              vehicles={fleet.vehicles}
+              onAdd={fleet.addVehicle}
+              onUpdate={fleet.updateVehicle}
+              onDelete={fleet.deleteVehicle}
+            />
+          }
+        />
+        <Route
+          path="/routes"
+          element={
+            <RoutesPage
+              routes={fleet.routes}
+              onAdd={fleet.addRoute}
+              onUpdate={fleet.updateRoute}
+              onDelete={fleet.deleteRoute}
+            />
+          }
+        />
         <Route path="/tracking" element={<TrackingPage vehicles={fleet.vehicles} trips={fleet.trips} routes={fleet.routes} />} />
       </Route>
     </Routes>

@@ -1,4 +1,4 @@
-import { Bell, LayoutDashboard, Map, Moon, Package, Sun, ToggleLeft, Truck } from "lucide-react";
+import { Bell, LayoutDashboard, Map, Moon, Package, Sun, ToggleLeft, Truck, Waypoints } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { cn } from "../../lib/utils";
 import type { PlanningMode } from "../../types/fleet";
@@ -8,6 +8,7 @@ const navItems = [
   { to: "/trips", label: "Trips", icon: Truck },
   { to: "/orders", label: "Orders", icon: Package },
   { to: "/vehicles", label: "Vehicles", icon: Truck },
+  { to: "/routes", label: "Routes", icon: Waypoints },
   { to: "/tracking", label: "Tracking", icon: Map }
 ];
 

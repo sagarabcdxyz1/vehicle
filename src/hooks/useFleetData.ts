@@ -115,9 +115,7 @@ export const useFleetData = () => {
       .channel("vehicles-stream")
       .on("postgres_changes", { event: "*", schema: "public", table: "vehicles" }, async () => {
         const { data } = await client.from("vehicles").select("*");
-        if (data) {
-          setVehicles(data as Vehicle[]);
-        }
+        if (data) setVehicles(data as Vehicle[]);
       })
       .subscribe();
 
@@ -136,9 +134,27 @@ export const useFleetData = () => {
       })
       .subscribe();
 
+    const routeChannel = client
+      .channel("routes-stream")
+      .on("postgres_changes", { event: "*", schema: "public", table: "routes" }, async () => {
+        const { data } = await client.from("routes").select("*");
+        if (data) setRoutes(data as RouteDefinition[]);
+      })
+      .subscribe();
+
+    const orderChannel = client
+      .channel("orders-stream")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, async () => {
+        const { data } = await client.from("orders").select("*").order("created_at", { ascending: false });
+        if (data) setOrders(data as Order[]);
+      })
+      .subscribe();
+
     return () => {
       void client.removeChannel(vehicleChannel);
       void client.removeChannel(tripChannel);
+      void client.removeChannel(routeChannel);
+      void client.removeChannel(orderChannel);
     };
   }, []);
 
@@ -307,6 +323,41 @@ export const useFleetData = () => {
     return result.reason;
   };
 
+  const addVehicle = async (input: Omit<Vehicle, "id" | "available_at" | "status">) => {
+    if (!supabase) return;
+    await supabase.from("vehicles").insert({
+      id: randomId("veh"),
+      ...input,
+      available_at: toIso(new Date()),
+      status: "available"
+    });
+  };
+
+  const updateVehicle = async (id: string, input: Partial<Vehicle>) => {
+    if (!supabase) return;
+    await supabase.from("vehicles").update(input).eq("id", id);
+  };
+
+  const deleteVehicle = async (id: string) => {
+    if (!supabase) return;
+    await supabase.from("vehicles").delete().eq("id", id);
+  };
+
+  const addRoute = async (input: RouteDefinition) => {
+    if (!supabase) return;
+    await supabase.from("routes").insert(input);
+  };
+
+  const updateRoute = async (id: string, input: Partial<RouteDefinition>) => {
+    if (!supabase) return;
+    await supabase.from("routes").update(input).eq("id", id);
+  };
+
+  const deleteRoute = async (id: string) => {
+    if (!supabase) return;
+    await supabase.from("routes").delete().eq("id", id);
+  };
+
   const snapshot = useMemo<FleetSnapshot>(
     () => ({
       routes,
@@ -324,6 +375,12 @@ export const useFleetData = () => {
     setPlanningMode,
     addOrder,
     uploadCsv,
-    reassignOrder
+    reassignOrder,
+    addVehicle,
+    updateVehicle,
+    deleteVehicle,
+    addRoute,
+    updateRoute,
+    deleteRoute
   };
 };
